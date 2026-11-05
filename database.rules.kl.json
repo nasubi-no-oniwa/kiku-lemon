@@ -8,7 +8,7 @@
         ".validate": "newData.val() === now"
       },
       "v": {
-        ".validate": "newData.val() === 1"
+        ".validate": "newData.val() === 1 || newData.val() === 2"
       },
       "$other": {
         ".validate": false
@@ -46,7 +46,7 @@
           ".validate": "newData.isString() && newData.val().length === newData.parent().child('c').val() * 2 && newData.val().matches(/^[0-9a-z]+$/)"
         },
         "v": {
-          ".validate": "newData.val() === 1"
+          ".validate": "newData.val() === 1 || newData.val() === 2"
         },
         "t": {
           ".validate": "newData.val() === now"
@@ -88,7 +88,7 @@
           ".validate": "newData.isString() && newData.val().length === newData.parent().child('c').val() * 2 && newData.val().matches(/^[0-9a-z]+$/)"
         },
         "v": {
-          ".validate": "newData.val() === 1"
+          ".validate": "newData.val() === 1 || newData.val() === 2"
         },
         "t": {
           ".validate": "newData.val() === now"

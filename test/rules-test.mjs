@@ -36,6 +36,8 @@ ex('13文字の名前',await req('PUT','kl/all/scores/'+U,U,rec(tk.st,4000,3,270
 tk=await ticket(U);ex('2秒たって、もう一度始める',tk.r,true);await sleep(3200);
 ex('前より悪い記録は全期間に載らない',await req('PUT','kl/all/scores/'+U,U,rec(tk.st,3000,2,180)),false);
 ex('今日のほうも前より悪い記録は載らない',await req('PUT','kl/d/scores/'+U,U,{...rec(tk.st,3000,2,180),dk:dk()}),false);
+await sleep(2100);tk=await ticket(U2);await sleep(3200);ex('新しい版（v2）の記録',await req('PUT','kl/all/scores/'+U2,U2,{...rec(tk.st,3000,2,180),v:2}),true);
+ex('知らない版（v3）の記録',await req('PUT','kl/d/scores/'+U2,U2,{...rec(tk.st,3000,2,180),v:3,dk:dk()}),false);
 ex('ランキングはだれでも読める',await req('GET','kl/all/scores',null),true);
 ex('始めた時刻は本人以外読めない',await req('GET','kl/runs/'+U,U2),false);
 console.log(fail?('失敗 '+fail+' 件'):'すべて合格');
