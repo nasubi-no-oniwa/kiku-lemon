@@ -1,7 +1,9 @@
 // 菊とレモン：流れてくる物の並びと、記録の確かめ（ゲームと記録の確認で同じものを使う）
 (function (root, f) { if (typeof module === 'object' && module.exports) module.exports = f(); else root.KL = f(); })(typeof self !== 'undefined' ? self : this, function () {
-  const V = 1;        // 計算の版。並びを変えたら上げる
-  const W = 130;      // 押せる幅（前後 ms）
+  const V = 2;        // 計算の版。並び・押せる幅を変えたら上げる（前の版の記録も確かめられるように残す）
+  // 版ごとの押せる幅（前後 ms）と「ちょうど」の幅。v1=最初の版、v2=押せる幅を広げた版
+  const WV = { 1: 130, 2: 180 }, PV = { 1: 20, 2: 45 };
+  const W = WV[V];
   const CAP = 60000;  // ここで最高速になる（ms）
   const FIRST = 2400; // 最初の物が真下に来る時刻（ms）
   function rng(seed) { let a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -22,9 +24,9 @@
     }
     return { T(i) { while (TT.length <= i) more(); return TT[i]; }, K(i) { while (KK.length <= i) more(); return KK[i]; } };
   }
-  // ずれ(ms)→点数：前後20msまでがちょうど100点、押せる幅のはしで50点
-  function pts(e) { const a = Math.abs(e); return a <= 20 ? 100 : 100 - Math.ceil(50 * (a - 20) / (W - 20)); }
-  const enc = e => (e + W).toString(36).padStart(2, '0');
+  // ずれ(ms)→点数：「ちょうど」の幅までは100点、押せる幅のはしで50点
+  function pts(e, v = V) { const a = Math.abs(e), w = WV[v], q = PV[v]; return a <= q ? 100 : 100 - Math.ceil(50 * (a - q) / (w - q)); }
+  const enc = (e, v = V) => (e + WV[v]).toString(36).padStart(2, '0');
   // ベルトの速さ（見た目用、1秒あたり）と、進んだ長さ
   const V0 = 1.125, V1 = 2.7;
   function speed(ms) { return V0 + (V1 - V0) * Math.min(1, Math.max(0, ms) / CAP); }
@@ -32,7 +34,8 @@
   // 記録の確かめ：同じ並びでやり直して、数・点数・終わった時刻が合うか
   function check(rec) {
     try {
-      if (!rec || rec.v !== V) return false;
+      if (!rec || !WV[rec.v]) return false;
+      const v = rec.v, W = WV[v];
       const c = rec.c, lg = rec.lg;
       if (!(Number.isInteger(c) && c >= 1) || typeof lg !== 'string' || lg.length !== c * 2 || !/^[0-9a-z]*$/.test(lg)) return false;
       const L = line(seedOf(rec.st));
@@ -42,7 +45,7 @@
         if (!(e >= -W && e <= W)) return false;
         const at = L.T(i) + e;
         if (at < last) return false;
-        last = at; p += pts(e); sum += e; sq += e * e;
+        last = at; p += pts(e, v); sum += e; sq += e * e;
       }
       if (p !== rec.p || rec.k !== c * 10000000 + p) return false;
       if (!(rec.s >= last && rec.s <= L.T(c) + W + 50)) return false;
