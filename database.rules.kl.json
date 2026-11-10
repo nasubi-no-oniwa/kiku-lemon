@@ -106,6 +106,38 @@
       }
     }
   },
+  "sa": {
+    ".read": true,
+    ".indexOn": [
+      "k"
+    ],
+    "$uid": {
+      ".write": "auth != null && auth.uid === $uid && newData.exists()",
+      ".validate": "newData.hasChildren(['n','c','p','k','t']) && newData.child('n').val() === newData.parent().parent().child('all/scores/' + $uid + '/n').val() && newData.child('c').val() === newData.parent().parent().child('all/scores/' + $uid + '/c').val() && newData.child('p').val() === newData.parent().parent().child('all/scores/' + $uid + '/p').val() && newData.child('k').val() === newData.parent().parent().child('all/scores/' + $uid + '/k').val()",
+      "t": {
+        ".validate": "newData.val() === now"
+      },
+      "$other": {
+        ".validate": false
+      }
+    }
+  },
+  "sd": {
+    ".read": true,
+    ".indexOn": [
+      "ds"
+    ],
+    "$uid": {
+      ".write": "auth != null && auth.uid === $uid && newData.exists()",
+      ".validate": "newData.hasChildren(['n','c','p','k','t','dk','ds']) && newData.child('n').val() === newData.parent().parent().child('d/scores/' + $uid + '/n').val() && newData.child('c').val() === newData.parent().parent().child('d/scores/' + $uid + '/c').val() && newData.child('p').val() === newData.parent().parent().child('d/scores/' + $uid + '/p').val() && newData.child('k').val() === newData.parent().parent().child('d/scores/' + $uid + '/k').val() && newData.child('dk').val() === newData.parent().parent().child('d/scores/' + $uid + '/dk').val() && newData.child('ds').val() === newData.parent().parent().child('d/scores/' + $uid + '/ds').val()",
+      "t": {
+        ".validate": "newData.val() === now"
+      },
+      "$other": {
+        ".validate": false
+      }
+    }
+  },
   "hidden": {
     ".read": true
   }

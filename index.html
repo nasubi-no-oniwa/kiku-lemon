@@ -521,11 +521,11 @@ async function submit(){
  try{
   const a=await fbAuth();
   const rec={n:ls.get('kl_name','')||t('anon'),c:G.c,p:G.p,k,s:G.s,st:G.st,lg:G.lg,v:K.V,t:{'.sv':'timestamp'}};
-  const dk=dayKey(Date.now());const recD={...rec,dk,ds:dk*10000000000+rec.k};G.sent={rec,recD};
+  const dk=dayKey(Date.now());const recD={...rec,dk,ds:dk*10000000000+rec.k};const sl={n:rec.n,c:rec.c,p:rec.p,k:rec.k,t:{'.sv':'timestamp'}},slD={...sl,dk,ds:recD.ds};G.sent={rec,recD,sl,slD};
   const [cur,curD]=await Promise.all([fetchR(DB('all/scores/'+a.uid)+'.json').then(x=>x.ok?x.json():null).catch(()=>null),fetchR(DB('d/scores/'+a.uid)+'.json').then(x=>x.ok?x.json():null).catch(()=>null)]);
   const okAll=!cur||cur.k<k,okD=!curD||curD.dk!==dk||curD.k<k;
-  if(okD){const res=await PUT(DB('d/scores/'+a.uid)+Q(a),recD);if(res.ok)G.sent.d=1;}
-  if(okAll){const res=await PUT(DB('all/scores/'+a.uid)+Q(a),rec);if(res.ok)G.sent.all=1;}
+  if(okD){if(await put2('d/scores/'+a.uid,recD,'sd/'+a.uid,slD,a)){G.sent.d=1;MY.d={id:a.uid,n:rec.n,c:rec.c,p:rec.p,k:rec.k,t:Date.now(),dk};}}
+  if(okAll){if(await put2('all/scores/'+a.uid,rec,'sa/'+a.uid,sl,a)){G.sent.all=1;MY.all={id:a.uid,n:rec.n,c:rec.c,p:rec.p,k:rec.k,t:Date.now()};}}
   if(!G.sent.d&&!G.sent.all){setMsg(okAll||okD?t('senderr'):t('notbetter'),okAll||okD?'err':'');return;}
   sendState.canRename=true;
   const rk=await myRank(G.sent.d?'d':'all',a.uid);setMsg(t('sent',{r:rk||'?'}),'ok');
@@ -538,19 +538,18 @@ $('renameBtn').onclick=async()=>{
  if(badName(n)){m.textContent=t('badname');m.className='note err';return;}
  ls.set('kl_name',n);if(!G||!G.sent)return;$('renameBtn').disabled=true;
  try{const a=await fbAuth();
-  if(G.sent.d){const res=await PUT(DB('d/scores/'+a.uid)+Q(a),{...G.sent.recD,n});if(!res.ok)throw 0;}
-  if(G.sent.all){const res=await PUT(DB('all/scores/'+a.uid)+Q(a),{...G.sent.rec,n});if(!res.ok)throw 0;}
+  if(G.sent.d){if(!await put2('d/scores/'+a.uid,{...G.sent.recD,n},'sd/'+a.uid,{...G.sent.slD,n},a))throw 0;if(MY.d)MY.d.n=n;}
+  if(G.sent.all){if(!await put2('all/scores/'+a.uid,{...G.sent.rec,n},'sa/'+a.uid,{...G.sent.sl,n},a))throw 0;if(MY.all)MY.all.n=n;}
   m.textContent=t('renamed');m.className='note ok';$('renameRow').hidden=true;
  }catch(e){m.textContent=t('senderr');m.className='note err';}
  $('renameBtn').disabled=false;
 };
 $('nameIn').addEventListener('change',()=>{const n=$('nameIn').value.trim();if(n&&badName(n)){$('nameIn').value='';return;}ls.set('kl_name',n);});
-async function loadBoard(board){
- const today=dayKey(Date.now());
- const url=board==='d'?DB('d/scores')+'.json?orderBy=%22ds%22&startAt='+(today*10000000000)+'&endAt='+(today*10000000000+9999999999)+'&limitToLast=100':DB('all/scores')+'.json?orderBy=%22k%22&limitToLast=100';
- const [d,h]=await Promise.all([fetch(url).then(r=>{if(!r.ok)throw 0;return r.json()}),fetch(DB('hidden')+'.json').then(r=>r.ok?r.json():null).catch(()=>null)]);
- return Object.entries(d||{}).map(([id,v])=>({...v,id})).filter(r=>!(h&&h[r.id])&&typeof r.k==='number'&&(board!=='d'||r.dk===today)).sort((a,b)=>b.k-a.k||a.t-b.t);
-}
+// ランキングは「名前・個数・点数だけの軽い写し」（sa・sd）を読む。押した記録（lg）入りの100人分は読まない。自分の新しい記録はその場で表に足す
+let MY={};const BC={};
+async function loadBoard(board){ const today=dayKey(Date.now());const c=BC[board];let rows; if(c&&Date.now()-c.t<60000&&c.dk===today)rows=c.rows;else{ const lo=today*10000000000,hi=lo+9999999999; const q=(p,o)=>DB(p)+'.json?orderBy=%22'+o+'%22'+(board==='d'?'&startAt='+lo+'&endAt='+hi:'')+'&limitToLast=100'; const get=u=>fetchR(u).then(r=>{if(!r.ok)throw 0;return r.json()}); const hp=fetchR(DB('hidden')+'.json').then(r=>r.ok?r.json():null).catch(()=>null); let d; try{d=await get(board==='d'?q('sd','ds'):q('sa','k'));}catch(e){d=await get(board==='d'?q('d/scores','ds'):q('all/scores','k'));} const h=await hp; rows=Object.entries(d||{}).map(([id,v])=>({id,n:v.n,c:v.c,p:v.p,k:v.k,t:v.t,dk:v.dk})).filter(r=>!(h&&h[r.id])&&typeof r.k==='number'&&(board!=='d'||r.dk===today)); BC[board]={t:Date.now(),dk:today,rows}; } rows=rows.slice(); const m=MY[board]; if(m&&(board!=='d'||m.dk===today)){const i=rows.findIndex(r=>r.id===m.id);if(i>=0){if(rows[i].k<=m.k)rows[i]={...rows[i],...m};}else rows.push(m);} return rows.sort((a,b)=>b.k-a.k||a.t-b.t); }
+// 記録と軽い写しをまとめて書く。うまくいかないときは前と同じ書き方（記録だけ）で書く
+async function put2(p1,v1,p2,v2,a){try{const r=await fetchR(DBROOT+Q(a),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({[p1]:v1,[p2]:v2})});if(r.ok)return true;}catch(_){}const r=await PUT(DB(p1)+Q(a),v1);return r.ok;}
 async function myRank(board,uid){try{const rows=await loadBoard(board);const i=rows.findIndex(r=>r.id===uid);return i>=0?i+1:null;}catch(e){return null;}}
 let rankFrom=false;
 async function openRank(board,fromResult){
