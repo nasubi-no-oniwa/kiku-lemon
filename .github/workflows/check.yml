@@ -1,4 +1,4 @@
-# ランキングの記録を、ゲームと同じ計算でもう一度確かめる（10分ごと）。合わない記録・kl-remove.txt に書いたIDの記録を消す
+# ランキングの記録を、ゲームと同じ計算でもう一度確かめる（10分ごと）。合わない記録・kl-remove.txt に書いたIDの記録を消し、ランキング用の軽い写しを記録とそろえる
 name: 記録の確認
 on:
   schedule:
@@ -7,6 +7,7 @@ on:
     branches: [main]
     paths:
       - 'kl-remove.txt'
+      - 'tools/check-scores.mjs'
       - '.github/workflows/check.yml'
   workflow_dispatch:
 concurrency:
