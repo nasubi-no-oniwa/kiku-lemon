@@ -61,7 +61,8 @@
     "scores": {
       ".read": true,
       ".indexOn": [
-        "dk"
+        "dk",
+        "ds"
       ],
       "$uid": {
         ".write": "auth != null && auth.uid === $uid && newData.exists() && ((newData.child('st').val() === root.child('kl/runs/' + $uid + '/t').val() && (!data.exists() || newData.child('dk').val() > data.child('dk').val() || (newData.child('dk').val() === data.child('dk').val() && newData.child('st').val() > data.child('st').val() && newData.child('k').val() > data.child('k').val())) && now >= newData.child('st').val() + newData.child('s').val() - 2000 && now <= newData.child('st').val() + newData.child('s').val() + 60000) || (data.exists() && newData.child('st').val() === data.child('st').val() && newData.child('s').val() === data.child('s').val() && newData.child('c').val() === data.child('c').val() && newData.child('p').val() === data.child('p').val() && newData.child('lg').val() === data.child('lg').val() && newData.child('dk').val() === data.child('dk').val()))",
@@ -98,6 +99,9 @@
         },
         "dk": {
           ".validate": "newData.isNumber() && newData.val() * 86400000 <= now + 32400000 && now + 32400000 < (newData.val() + 1) * 86400000"
+        },
+        "ds": {
+          ".validate": "newData.isNumber() && newData.val() === newData.parent().child('dk').val() * 10000000000 + newData.parent().child('k').val()"
         }
       }
     }

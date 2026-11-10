@@ -497,7 +497,7 @@ async function fbAuth(){
 }
 fbAuth().catch(()=>{});
 const DB=p=>FB.databaseURL+'/kl/'+p;
-const Q=a=>'.json?auth='+encodeURIComponent(a.token);
+const Q=a=>'.json?auth='+encodeURIComponent(a.token);const QJ=Q,DBROOT=FB.databaseURL+'/kl';
 const PUT=(url,body)=>fetchR(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
 // ずる対策：始める前にサーバーの時計を書く。その時刻で流れてくる並びが決まる
 function takeTicket(){
@@ -521,7 +521,7 @@ async function submit(){
  try{
   const a=await fbAuth();
   const rec={n:ls.get('kl_name','')||t('anon'),c:G.c,p:G.p,k,s:G.s,st:G.st,lg:G.lg,v:K.V,t:{'.sv':'timestamp'}};
-  const dk=dayKey(Date.now());const recD={...rec,dk};G.sent={rec,recD};
+  const dk=dayKey(Date.now());const recD={...rec,dk,ds:dk*10000000000+rec.k};G.sent={rec,recD};
   const [cur,curD]=await Promise.all([fetchR(DB('all/scores/'+a.uid)+'.json').then(x=>x.ok?x.json():null).catch(()=>null),fetchR(DB('d/scores/'+a.uid)+'.json').then(x=>x.ok?x.json():null).catch(()=>null)]);
   const okAll=!cur||cur.k<k,okD=!curD||curD.dk!==dk||curD.k<k;
   if(okD){const res=await PUT(DB('d/scores/'+a.uid)+Q(a),recD);if(res.ok)G.sent.d=1;}
@@ -547,9 +547,9 @@ $('renameBtn').onclick=async()=>{
 $('nameIn').addEventListener('change',()=>{const n=$('nameIn').value.trim();if(n&&badName(n)){$('nameIn').value='';return;}ls.set('kl_name',n);});
 async function loadBoard(board){
  const today=dayKey(Date.now());
- const url=board==='d'?DB('d/scores')+'.json?orderBy=%22dk%22&equalTo='+today:DB('all/scores')+'.json?orderBy=%22k%22&limitToLast=300';
+ const url=board==='d'?DB('d/scores')+'.json?orderBy=%22ds%22&startAt='+(today*10000000000)+'&endAt='+(today*10000000000+9999999999)+'&limitToLast=100':DB('all/scores')+'.json?orderBy=%22k%22&limitToLast=100';
  const [d,h]=await Promise.all([fetch(url).then(r=>{if(!r.ok)throw 0;return r.json()}),fetch(DB('hidden')+'.json').then(r=>r.ok?r.json():null).catch(()=>null)]);
- return Object.entries(d||{}).map(([id,v])=>({...v,id})).filter(r=>!(h&&h[r.id])&&typeof r.k==='number').sort((a,b)=>b.k-a.k||a.t-b.t);
+ return Object.entries(d||{}).map(([id,v])=>({...v,id})).filter(r=>!(h&&h[r.id])&&typeof r.k==='number'&&(board!=='d'||r.dk===today)).sort((a,b)=>b.k-a.k||a.t-b.t);
 }
 async function myRank(board,uid){try{const rows=await loadBoard(board);const i=rows.findIndex(r=>r.id===uid);return i>=0?i+1:null;}catch(e){return null;}}
 let rankFrom=false;
