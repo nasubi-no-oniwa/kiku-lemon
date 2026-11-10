@@ -40,16 +40,6 @@ await sleep(2100);tk=await ticket(U2);await sleep(3200);ex('新しい版（v2）
 ex('知らない版（v3）の記録',await req('PUT','kl/d/scores/'+U2,U2,{...rec(tk.st,3000,2,180),v:3,dk:dk()}),false);
 ex('ランキングはだれでも読める',await req('GET','kl/all/scores',null),true);
 ex('始めた時刻は本人以外読めない',await req('GET','kl/runs/'+U,U2),false);
-// ---- しらべる用（あとで消す）
-{await sleep(2100);const tq=await ticket(U3);await sleep(3200);const Q1=rec(tq.st,3000,4,360);
-ex('しらべ1 kl にまとめて書く（記録だけ）',await req('PATCH','kl',U3,{['all/scores/'+U3]:Q1}),true);
-const g=await req('GET','kl/all/scores/'+U3,null);console.log('しらべ 記録',JSON.stringify(g.j));
-const sq={n:g.j.n,c:g.j.c,p:g.j.p,k:g.j.k,t:TS};
-ex('しらべ2 写しだけ PUT',await req('PUT','kl/sa/'+U3,U3,sq),true);
-ex('しらべ3 写しだけ kl に PATCH',await req('PATCH','kl',U3,{['sa/'+U3]:sq}),true);
-ex('しらべ4 写しの t なし',await req('PUT','kl/sa/'+U3,U3,{n:sq.n,c:sq.c,p:sq.p,k:sq.k}),false);
-ex('しらべ5 写し n だけ（ほかなし）',await req('PATCH','kl/sa/'+U3,U3,{n:sq.n}),false);
-}
 // 軽い写し（ランキングを軽く読むための「名前・個数・点数だけ」の写し。記録と同じ中身のときだけ書ける）
 await sleep(2100);tk=await ticket(U);ex('写しの試験のために始める',tk.r,true);await sleep(3200);
 const slim=r=>({n:r.n,c:r.c,p:r.p,k:r.k,t:TS});

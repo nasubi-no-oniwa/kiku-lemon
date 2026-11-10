@@ -114,6 +114,18 @@
     "$uid": {
       ".write": "auth != null && auth.uid === $uid && newData.exists()",
       ".validate": "newData.hasChildren(['n','c','p','k','t']) && newData.child('n').val() === newData.parent().parent().child('all/scores/' + $uid + '/n').val() && newData.child('c').val() === newData.parent().parent().child('all/scores/' + $uid + '/c').val() && newData.child('p').val() === newData.parent().parent().child('all/scores/' + $uid + '/p').val() && newData.child('k').val() === newData.parent().parent().child('all/scores/' + $uid + '/k').val()",
+      "n": {
+        ".validate": "newData.isString()"
+      },
+      "c": {
+        ".validate": "newData.isNumber()"
+      },
+      "p": {
+        ".validate": "newData.isNumber()"
+      },
+      "k": {
+        ".validate": "newData.isNumber()"
+      },
       "t": {
         ".validate": "newData.val() === now"
       },
@@ -130,6 +142,24 @@
     "$uid": {
       ".write": "auth != null && auth.uid === $uid && newData.exists()",
       ".validate": "newData.hasChildren(['n','c','p','k','t','dk','ds']) && newData.child('n').val() === newData.parent().parent().child('d/scores/' + $uid + '/n').val() && newData.child('c').val() === newData.parent().parent().child('d/scores/' + $uid + '/c').val() && newData.child('p').val() === newData.parent().parent().child('d/scores/' + $uid + '/p').val() && newData.child('k').val() === newData.parent().parent().child('d/scores/' + $uid + '/k').val() && newData.child('dk').val() === newData.parent().parent().child('d/scores/' + $uid + '/dk').val() && newData.child('ds').val() === newData.parent().parent().child('d/scores/' + $uid + '/ds').val()",
+      "n": {
+        ".validate": "newData.isString()"
+      },
+      "c": {
+        ".validate": "newData.isNumber()"
+      },
+      "p": {
+        ".validate": "newData.isNumber()"
+      },
+      "k": {
+        ".validate": "newData.isNumber()"
+      },
+      "dk": {
+        ".validate": "newData.isNumber()"
+      },
+      "ds": {
+        ".validate": "newData.isNumber()"
+      },
       "t": {
         ".validate": "newData.val() === now"
       },
