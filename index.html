@@ -110,6 +110,9 @@ if(!IDS.length)return;
 function vis(e){if(!e||!e.isConnected||e.closest('[hidden]'))return false;var r=e.getBoundingClientRect();if(r.width<1||r.height<1)return false;for(var n=e;n&&n.nodeType===1;n=n.parentElement){var s=getComputedStyle(n);if(s.display==='none'||s.visibility==='hidden'||parseFloat(s.opacity)<0.05)return false;}return true;}
 var was={};setInterval(function(){try{var any=false;for(var i=0;i<IDS.length;i++){if(vis(document.getElementById(IDS[i])))any=true;}if(any&&!was.v)ev('result_view');was.v=any;}catch(e){}},700);
 }catch(e){}})();</script>
+<!-- nasubi-next: 結果画面に「次のゲーム」を出す（右にスライドするか押すと、おすすめの画面。中身は nasubi-no-oniwa.github.io/next/next.js で全作品共通） -->
+<script>window.NSB_NEXT={"g": "kiku-lemon", "r": [{"a": "#result .card", "v": "#result"}], "ad": 0};</script>
+<script src="https://nasubi-no-oniwa.github.io/next/next.js" defer></script>
 </head>
 <body>
 <canvas id="c"></canvas>
