@@ -232,7 +232,7 @@ ko:{title:'<span class="k">국화</span>와 <span class="l">레몬</span>',sub:'
  again:'한 번 더',xpost:'X에 올리기',top:'타이틀로',back:'돌아가기',
  today:'오늘',alltime:'전체',rkNote:'처리한 개수 순 (같으면 점수)',loading:'불러오는 중…',empty:'아직 아무도 없습니다',rankerr:'랭킹을 불러오지 못했습니다',
  post:'국화와 레몬에서 {c}개 처리 ({p}점)\n칭호 「{g}」',webgl:'이 기기에서는 3D를 표시할 수 없습니다'}};
-const TAGS='#菊とレモン';
+const TAGS='#菊とレモン #ブラウザゲーム';
 const LANGS=[['ja','日本語'],['en','English'],['zh','繁中'],['ko','한국어']];
 let lang=(q=>['ja','en','zh','ko'].includes(q)?q:null)(new URLSearchParams(location.search).get('lang'))||ls.get('kl_lang',null)||(n=>n.startsWith('ja')?'ja':n.startsWith('zh')?'zh':n.startsWith('ko')?'ko':'en')((navigator.language||'ja').toLowerCase());
 function t(k,o){let s=TX[lang]&&TX[lang][k]!=null?TX[lang][k]:TX.ja[k];if(o&&typeof s==='string')s=s.replace(/\{(\w+)\}/g,(_,x)=>o[x]);return s;}
